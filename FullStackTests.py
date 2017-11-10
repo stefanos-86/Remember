@@ -81,6 +81,8 @@ if __name__ == "__main__":
     else:
         test_list = [args.test_case]
 
+    print "Tests to run " + str(test_list)
+
     for test_case in test_list:
         run_test(test_case)
 
