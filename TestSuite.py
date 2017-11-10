@@ -7,8 +7,8 @@ CORES_FOLDER = os.path.abspath("testCores")
 TEST_PROGRAMS_FOLDER = os.path.abspath("testPrograms")
 
 
-def find_executables():
-    """Explores the conventional test programs folder to find all the executables in the cmake file. """
+def find_test_cases():
+    """Explores the conventional test programs folder to find all the executables to build in the cmake file. """
     programs = []
     expected_line_beginning = "add_executable("
     expected_line_beginning_size = len(expected_line_beginning)

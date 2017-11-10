@@ -47,6 +47,6 @@ def run_and_core(executable):
 if __name__ == "__main__":
     clean_up_core_folder()
     compile_test_programs()
-    executables = ts.find_executables()
+    executables = ts.find_test_cases()
     for program in executables:
         run_and_core(program)

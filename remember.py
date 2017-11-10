@@ -69,7 +69,7 @@ def check_dot_file(dot_file):
 def invoke_gdb(core_file, binary):
     """Actually starts the debugger (passing it our special script to capture the memory)."""
     log.info("Calling GDB.")
-    subprocess.call(["gdb", "-c", core_file, "-x", "gdb_driver.py", binary])
+    subprocess.call(["gdb", "-c", core_file, "-x", "GdbDriver.py", binary])
 
 
 def draw_graph(dot_input, graph_output):
