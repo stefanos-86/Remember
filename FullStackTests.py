@@ -11,7 +11,6 @@ import subprocess
 import TestSuite as ts
 
 LOGS_FOR_TESTS = "FullStackTest.log"
-RESULT_FROM_TEST = "FullStackTest.dot"
 
 def parse_command_line():
     parser = argparse.ArgumentParser(description='Utility to quickly run the full stack test cases. '
@@ -45,7 +44,7 @@ def assert_result(test_name):
     with open(expected_result_file) as f:
         expected = f.readlines()
 
-    with open(RESULT_FROM_TEST) as f:
+    with open(os.path.abspath("RememberOutput.dot")) as f:
         actual = f.readlines()
 
     changes = difflib.unified_diff(expected, actual,
@@ -69,7 +68,8 @@ def run_test(test_name):
         raise Exception("No core file for " + test_name)
 
     exeutable_file = os.path.join(ts.TEST_PROGRAMS_FOLDER, test_name)
-    subprocess.call(["python", "remember.py", core_file,  exeutable_file, "-l", LOGS_FOR_TESTS, "-o", RESULT_FROM_TEST])
+    subprocess.call(["python", "remember.py", core_file,  exeutable_file,
+                     "-l", LOGS_FOR_TESTS, "-o", "GraphFromLastTest.svg"])
 
     assert_result(test_name)
 
@@ -83,3 +83,4 @@ if __name__ == "__main__":
 
     for test_case in test_list:
         run_test(test_case)
+
