@@ -4,7 +4,6 @@ import os
 import pickle
 import subprocess
 
-
 # Entry point for the tool.
 # Check usage with --help.
 

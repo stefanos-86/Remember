@@ -10,8 +10,8 @@ import sys
 
 # Bring the support modules into view.
 sys.path.append(".")
+import ExportToDot
 import MemoryRepresentation
-
 
 def load_parameters():
     """Read the "bridge file to get back the arguments."""
@@ -40,7 +40,8 @@ def gdb_command(command):
 def save_results():
     dot_file = os.path.abspath("RememberOutput.dot")
     result_file = open(dot_file, "w")
-    result_file.write(ScanMemoryDecorator.memory.to_dot())
+    result_graph = ExportToDot.export(ScanMemoryDecorator.memory)
+    result_file.write(result_graph)
     result_file.flush()
 
 
