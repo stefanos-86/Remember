@@ -73,26 +73,32 @@ class ScanMemoryDecorator(gdb.FrameDecorator.FrameDecorator):
 
         called_from_frame = frame.older()
         if called_from_frame is None:
-            log.debug("Previous is None")
-            end_address = self.guess_where_main_begins(frame)
+            end_address = mem.UNKNOWN_ADDRESS
         else:  # This frame ends where the other one started.
             end_address = str(called_from_frame.read_register("sp"))
 
         frame_image = mem.MemoryObject(function_name, begin_address, end_address)
         ScanMemoryDecorator.memory.add_object(frame_image)
 
+        self.scan_local_variables(frame, frame_image)
 
-    def guess_where_main_begins(self, main_frame):
-        """For some reason, rbp is equal to sp for the main frame.
-           I need to workaround to understand the size of the frame."""
-        text_to_parse = gdb_command("info frame")
-        previous_frame_marker = "Previous frame's sp is "
-        for line in text_to_parse.split("\n"):
-            marker_position = line.find(previous_frame_marker)
-            if marker_position != -1:
-                address = line[marker_position + len(previous_frame_marker):]
-                return address
-        return mem.UNKNOWN_ADDRESS
+
+    def scan_local_variables(self, frame, frame_image):
+        """Check what is in a stack frame for more pointers or struct to explore."""
+        function_code = frame.block()
+
+        for symbol in function_code:
+            if symbol.is_variable or symbol.is_argument:
+                variable_type = symbol.type
+                if variable_type.code == gdb.TYPE_CODE_PTR:
+                    pointed_at_address = frame.read_var(symbol, function_code)
+                    variable_name = symbol.name
+                    new_pointer = mem.Pointer(variable_name,
+                                              str(pointed_at_address),
+                                              pointed_at_address.is_optimized_out)
+                    frame_image.add_outgoing_pointer(new_pointer)
+                    # And recursion!
+
 
 
 

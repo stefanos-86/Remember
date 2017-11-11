@@ -1,5 +1,3 @@
-
-
 void  recursion(int level) {
 	int * pointer;
 
@@ -11,10 +9,6 @@ void  recursion(int level) {
 
 int main(void)
 {
-	int x;
-	int *y = 0;
-	int *z = &x;
-
 	recursion(10);
 	return 0;
 }

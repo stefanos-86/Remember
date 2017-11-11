@@ -4,8 +4,7 @@ int main(void)
 {
     int does_not_count;  // Not a pointer, we don't care.
     int* null_pointer = nullptr;
-    int* optimized_out_1 = &does_not_count;
-    int& optimized_out_2 = does_not_count;
+    int* unresolvable = &does_not_count;  // Can't figure out how big the main frame is, so can't find this pointer.
 
 	while(true);
 	return 0;
