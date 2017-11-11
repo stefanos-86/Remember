@@ -7,6 +7,7 @@ project(Remember)
 add_definitions(-std=c++11 -g -O0)
 
 add_executable(justMain                 justMain.cpp)
+add_executable(mainLocalVariables       mainLocalVariables.cpp)
 
 # "Legacy" stuff to be removed - don't forget to kill the sample programs!
 #add_executable(infiniteMain                 infiniteMain.cpp)

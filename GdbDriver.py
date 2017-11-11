@@ -11,7 +11,7 @@ import sys
 # Bring the support modules into view.
 sys.path.append(".")
 import ExportToDot
-import MemoryRepresentation
+import MemoryRepresentation as mem
 
 def load_parameters():
     """Read the "bridge file to get back the arguments."""
@@ -53,18 +53,50 @@ class ScanMemoryDecorator(gdb.FrameDecorator.FrameDecorator):
         The representation must be saved in a class-level variable because construction and interface of the instances
         are "locked down" by GDB and there is no place to pass extra parameters (that I know of). """
 
-    memory = MemoryRepresentation.Memory()  # The whole goal is to fill this.
+    memory = mem.Memory()  # The whole goal is to fill this.
 
     def __init__(self, fobj):
         super().__init__(fobj)
         self.fobj = fobj
 
     def function(self):
-        """This function was re-purposed as the entry point for the memory analisys."""
+        """This function was re-purposed as the entry point for the memory analysis."""
         self.scan_stack_frame()
         return gdb.FrameDecorator.FrameDecorator.function(self)  # Same text output as without this class.
 
+
     def scan_stack_frame(self):
+        frame = self.fobj.inferior_frame()
+
+        function_name = str(frame.name())
+        begin_address = str(frame.read_register("sp"))  # The stack grows "going down", begin is higher then end.
+
+        called_from_frame = frame.older()
+        if called_from_frame is None:
+            log.debug("Previous is None")
+            end_address = self.guess_where_main_begins(frame)
+        else:  # This frame ends where the other one started.
+            end_address = str(called_from_frame.read_register("sp"))
+
+        frame_image = mem.MemoryObject(function_name, begin_address, end_address)
+        ScanMemoryDecorator.memory.add_object(frame_image)
+
+
+    def guess_where_main_begins(self, main_frame):
+        """For some reason, rbp is equal to sp for the main frame.
+           I need to workaround to understand the size of the frame."""
+        text_to_parse = gdb_command("info frame")
+        previous_frame_marker = "Previous frame's sp is "
+        for line in text_to_parse.split("\n"):
+            marker_position = line.find(previous_frame_marker)
+            if marker_position != -1:
+                address = line[marker_position + len(previous_frame_marker):]
+                return address
+        return mem.UNKNOWN_ADDRESS
+
+
+
+    def scan_stack_frame_OLD(self):
         frame = self.fobj.inferior_frame()
         name = str(frame.name())
         code = frame.block()
@@ -87,7 +119,7 @@ class ScanMemoryDecorator(gdb.FrameDecorator.FrameDecorator):
                                                            symbol.name)
                     self.scan_object(pointed_at_address)
 
-    def scan_object(self, pointer_to_object):
+    def scan_object_OLD(self, pointer_to_object):
         heap_value = pointer_to_object.dereference()
         type_to_analyze = heap_value.type
         end_address = pointer_to_object + 1  # pointer_to_object is a pointer. Doing + 1 goes one object ahead.

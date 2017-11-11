@@ -13,13 +13,13 @@ def export(memory_image):
     graph = Digraph('Memory Dump', node_attr={'shape': 'record'})
     graph.attr(rankdir='LR')
 
-    for block in memory_image.stack:
+    for block in memory_image.objects:
         draw_stack_frame(block, graph)
 
     return graph.source
 
 
 def draw_stack_frame(block, graph):
-    label =  block.name + '|' \
-            + str(block.begin) + ' - ' + str(block.end)
-    graph.node(str(block.begin), label)
+    label =  block.name_or_type + '|' \
+            + str(block.start_address) + ' - ' + str(block.end_address)
+    graph.node(str(block.start_address), label)  # The node id is the "beginning" of the object in memory.
