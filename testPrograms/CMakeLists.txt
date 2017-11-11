@@ -9,6 +9,7 @@ add_definitions(-std=c++11 -g -O0)
 add_executable(justMain                 justMain.cpp)
 add_executable(mainLocalVariables       mainLocalVariables.cpp)
 add_executable(recursiveStack           recursiveStack.cpp)
+add_executable(stackWithPointers        stackWithPointers.cpp)
 
 # "Legacy" stuff to be removed - don't forget to kill the sample programs!
 #add_executable(simpleStruct                 simpleStruct.cpp)

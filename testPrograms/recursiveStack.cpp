@@ -1,5 +1,5 @@
 void  recursion(int level) {
-	int * pointer;
+	int * pointer;  // Will be optimized out, even at -O0
 
 	if (level == 0)
 		while(true);

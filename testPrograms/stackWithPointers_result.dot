@@ -1,0 +1,11 @@
+digraph "Memory Dump" {
+	node [shape=record]
+	rankdir=LR
+	"0x7ffc110cfc80":p0 -> "0x7ffc110cfc90"
+	"0x7ffc110cfc80":p1 -> "0x7ffc110cfc90"
+	"0x7ffc110cfc80" [label="anotherFunction|0x7ffc110cfc80 - 0x7ffc110cfc90|<p0> y|<p1> pointerToY"]
+	"0x7ffc110cfc90":p0 -> UNKNOWN
+	"0x7ffc110cfc90":p1 -> UNKNOWN
+	"0x7ffc110cfc90" [label="function|0x7ffc110cfc90 - 0x7ffc110cfcd0|<p0> x|<p1> pointToInt"]
+	"0x7ffc110cfcd0" [label="main|0x7ffc110cfcd0 - Unknown"]
+}
