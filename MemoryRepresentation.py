@@ -23,7 +23,17 @@ class MemoryObject:
         if self.start_address == UNKNOWN_ADDRESS or self.end_address == UNKNOWN_ADDRESS:
             return False
 
-        return int(self.start_address, 0) <= int(pointer.pointed_address, 0) < int(self.end_address, 0)
+        return self.address_to_int(self.start_address) <= \
+               self.address_to_int(pointer.pointed_address) < \
+               self.address_to_int(self.end_address)
+
+    def address_to_int(self, address):
+        """Pointers start with 0x, references with @0x, but both must be convertible to something we can
+           compare and order, to guess where things are in memory."""
+        clean_address = address
+        if address.startswith("@"):
+            clean_address = address[1:]
+        return int(clean_address, 0)  # Base 0 is hex with 0x in front.
 
 
 class Pointer:

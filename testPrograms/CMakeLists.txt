@@ -13,6 +13,7 @@ add_executable(stackWithPointers        stackWithPointers.cpp)
 add_executable(stackLoop                stackLoop.cpp)
 add_executable(chainOfPointers          chainOfPointers.cpp)
 add_executable(heapLoop                 heapLoop.cpp)
+add_executable(references               references.cpp)
 
 # Not really intended for testing, but more to create nice graphs for demo purposes.
 add_executable(demo demo.cpp)

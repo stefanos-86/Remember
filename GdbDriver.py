@@ -101,7 +101,7 @@ class ScanMemoryDecorator(gdb.FrameDecorator.FrameDecorator):
         for symbol in function_code:
             if symbol.is_variable or symbol.is_argument:
                 variable_type = symbol.type
-                if variable_type.code == gdb.TYPE_CODE_PTR:
+                if self.is_a_pointer(variable_type):
                     pointed_at_address = frame.read_var(symbol, function_code)
                     new_pointer = mem.Pointer(symbol.name,
                                               str(pointed_at_address),
@@ -132,7 +132,7 @@ class ScanMemoryDecorator(gdb.FrameDecorator.FrameDecorator):
             class_variables = type_to_analyze.fields()
             for variable in class_variables:
                 log.debug("There is a variable " + str(variable.name))
-                if variable.type.code == gdb.TYPE_CODE_PTR:
+                if self.is_a_pointer(variable.type):
                     pointer_to_explore = pointed_struct[variable]
                     new_pointer = mem.Pointer(str(variable.name),
                                               str(pointer_to_explore),
@@ -141,6 +141,12 @@ class ScanMemoryDecorator(gdb.FrameDecorator.FrameDecorator):
                     if new_pointer.is_valid():  # Keep going.
                         self.scan_object(pointer_to_explore)
 
+
+    def is_a_pointer(self, gdb_type):
+        """For our purposes, a pointer is anything that "ends" on an object.
+           References work just the same way."""
+        gdb_code = gdb_type.code
+        return gdb_code == gdb.TYPE_CODE_PTR or gdb_code == gdb.TYPE_CODE_REF
 
 
 class ScanMemoryFilter():
