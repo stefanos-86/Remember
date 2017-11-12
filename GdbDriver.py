@@ -25,7 +25,11 @@ def prepare_logging(args):
     """There is no way to synch log from two processes, must use a different file.
        I could try to flush the logs, maybe (as I know that the main script stops working while
        GDB runs), but it is easier this way."""
-    local_log_file = os.path.abspath(args.logfile) + ".gdb"
+    if args.logfile == "/dev/null":
+        local_log_file = args.logfile
+    else:
+        local_log_file = os.path.abspath(args.logfile) + ".gdb"
+
     log.basicConfig(filename=local_log_file,
                     filemode="a",  # Must append to the file already created by the main script.
                     level=log.DEBUG)

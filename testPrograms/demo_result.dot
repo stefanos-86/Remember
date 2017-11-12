@@ -1,0 +1,19 @@
+digraph "Memory Dump" {
+	node [shape=record]
+	rankdir=LR
+	"0x7ffe89468360":p0 -> "0x94bca0"
+	"0x7ffe89468360" [label="anotherFunction|0x7ffe89468360 - 0x7ffe89468390|<p0> inFunction|pointerToInt (nullptr)"]
+	"0x94bca0":p0 -> "0x94bcc0"
+	"0x94bca0" [label="Level2|0x94bca0 - 0x94bca8|<p0> p"]
+	"0x94bcc0" [label="Level3|0x94bcc0 - 0x94bcc1"]
+	"0x7ffe89468390" [label="function|0x7ffe89468390 - 0x7ffe894683a0|pointToChar (optimized out)"]
+	"0x7ffe894683a0":p0 -> "0x94bc20"
+	"0x7ffe894683a0":p1 -> "0x94bc80"
+	"0x7ffe894683a0" [label="main|0x7ffe894683a0 - Unknown|<p0> insideMain|<p1> insideMain2"]
+	"0x94bc20":p0 -> "0x94bc40"
+	"0x94bc20" [label="Level1|0x94bc20 - 0x94bc28|<p0> p"]
+	"0x94bc40":p0 -> "0x94bc60"
+	"0x94bc40" [label="Level2|0x94bc40 - 0x94bc48|<p0> p"]
+	"0x94bc60" [label="Level3|0x94bc60 - 0x94bc61"]
+	"0x94bc80" [label="Level3|0x94bc80 - 0x94bc81"]
+}

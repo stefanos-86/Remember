@@ -14,5 +14,5 @@ add_executable(stackLoop                stackLoop.cpp)
 add_executable(chainOfPointers          chainOfPointers.cpp)
 add_executable(heapLoop                 heapLoop.cpp)
 
-# "Legacy" stuff to be removed - don't forget to kill the sample programs!
-#add_executable(mandrakata                   mandrakata.cpp)
+# Not really intended for testing, but more to create nice graphs for demo purposes.
+add_executable(demo demo.cpp)
