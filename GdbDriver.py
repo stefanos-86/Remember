@@ -7,6 +7,7 @@ import logging as log
 import os
 import pickle
 import sys
+import traceback
 
 # Bring the support modules into view.
 sys.path.append(".")
@@ -61,7 +62,12 @@ class ScanMemoryDecorator(gdb.FrameDecorator.FrameDecorator):
 
     def function(self):
         """This function was re-purposed as the entry point for the memory analysis."""
-        self.scan_stack_frame()
+        try:
+            self.scan_stack_frame()
+        except Exception as problem:
+            log.error(str(problem))
+            log.error("\n".join(traceback.format_exception(Exception, problem, None)))
+
         return gdb.FrameDecorator.FrameDecorator.function(self)  # Same text output as without this class.
 
 
@@ -106,13 +112,15 @@ class ScanMemoryDecorator(gdb.FrameDecorator.FrameDecorator):
         type_to_analyze = pointed_struct.type
 
         if type_to_analyze.code == gdb.TYPE_CODE_STRUCT:
-            end_address = object_address + 1  # pointer_to_object is a pointer. Doing + 1 goes one object ahead.
-                                              # pointer + type.sizeof is the same error it would be in C!
-            heap_object = mem.MemoryObject(str(type_to_analyze),
-                                           str(object_address),
-                                           str(end_address))
-            self.memory.add_object(heap_object)
-            self.scan_members(pointed_struct, heap_object)
+            if self.memory.unknown_object(str(object_address)):
+
+                end_address = object_address + 1  # pointer_to_object is a pointer. Doing + 1 goes one object ahead.
+                                                  # pointer + type.sizeof is the same error it would be in C!
+                heap_object = mem.MemoryObject(str(type_to_analyze),
+                                               str(object_address),
+                                               str(end_address))
+                self.memory.add_object(heap_object)
+                self.scan_members(pointed_struct, heap_object)
 
 
     def scan_members(self, pointed_struct, heap_object):

@@ -12,8 +12,7 @@ add_executable(recursiveStack           recursiveStack.cpp)
 add_executable(stackWithPointers        stackWithPointers.cpp)
 add_executable(stackLoop                stackLoop.cpp)
 add_executable(chainOfPointers          chainOfPointers.cpp)
+add_executable(heapLoop                 heapLoop.cpp)
 
 # "Legacy" stuff to be removed - don't forget to kill the sample programs!
-#add_executable(simpleStruct                 simpleStruct.cpp)
-#add_executable(nestedStructs                nestedStructs.cpp)
 #add_executable(mandrakata                   mandrakata.cpp)

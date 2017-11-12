@@ -71,7 +71,7 @@ def generic_addresses(dot_content):
        Or should I "wildcard" the addresses? Or abandon this way of testing?
        ...I wish I knew. For now, I replace the addresses with "generics"."""
     address_translation = {}
-    address = re.compile("(0x[0-9a-f]{12})")
+    address = re.compile("(0x[0-9a-f]+)")
     address_counter = 0
     filtered_result = []
 
