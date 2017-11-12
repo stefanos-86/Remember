@@ -49,4 +49,5 @@ if __name__ == "__main__":
     compile_test_programs()
     executables = ts.find_test_cases()
     for program in executables:
+        print "Working on " + program
         run_and_core(program)

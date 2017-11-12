@@ -71,6 +71,8 @@ class ScanMemoryDecorator(gdb.FrameDecorator.FrameDecorator):
         function_name = str(frame.name())
         begin_address = str(frame.read_register("sp"))  # The stack grows "going down", begin is higher then end.
 
+        log.debug(gdb_command("i locals"))
+
         called_from_frame = frame.older()
         if called_from_frame is None:
             end_address = mem.UNKNOWN_ADDRESS
