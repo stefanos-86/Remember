@@ -71,7 +71,6 @@ class ScanMemoryDecorator(gdb.FrameDecorator.FrameDecorator):
         function_name = str(frame.name())
         begin_address = str(frame.read_register("sp"))  # The stack grows "going down", begin is higher then end.
 
-        log.debug(gdb_command("i locals"))
 
         called_from_frame = frame.older()
         if called_from_frame is None:
@@ -94,54 +93,40 @@ class ScanMemoryDecorator(gdb.FrameDecorator.FrameDecorator):
                 variable_type = symbol.type
                 if variable_type.code == gdb.TYPE_CODE_PTR:
                     pointed_at_address = frame.read_var(symbol, function_code)
-                    variable_name = symbol.name
-                    new_pointer = mem.Pointer(variable_name,
+                    new_pointer = mem.Pointer(symbol.name,
                                               str(pointed_at_address),
                                               pointed_at_address.is_optimized_out)
                     frame_image.add_outgoing_pointer(new_pointer)
-                    # And recursion!
-
-
-
-
-    def scan_stack_frame_OLD(self):
-        frame = self.fobj.inferior_frame()
-        name = str(frame.name())
-        code = frame.block()
-
-        begin_address = str(frame.read_register("sp"))
-
-        end_address = "unknown"
-        previous = frame.older()
-        if previous is not None:
-            end_address = str(previous.read_register("sp"))
-
-        memory_for_frame = ScanMemoryDecorator.memory.add_stack_frame(begin_address, end_address, name)
-
-        for symbol in code:
-            if symbol.is_variable:
-                variable_type = symbol.type
-                if variable_type.code == gdb.TYPE_CODE_PTR:  # Else, check for pointer into the structure!
-                    pointed_at_address = frame.read_var(symbol, code)
-                    ScanMemoryDecorator.memory.add_pointer(memory_for_frame, pointed_at_address, str(symbol.type),
-                                                           symbol.name)
+                    # Navigate into the object to see if there are more pointers in it.
                     self.scan_object(pointed_at_address)
 
-    def scan_object_OLD(self, pointer_to_object):
-        heap_value = pointer_to_object.dereference()
-        type_to_analyze = heap_value.type
-        end_address = pointer_to_object + 1  # pointer_to_object is a pointer. Doing + 1 goes one object ahead.
-                                             # pointer + type.sizeof is the same error it would be in C!
+
+    def scan_object(self, object_address):
+        pointed_struct = object_address.dereference()
+        type_to_analyze = pointed_struct.type
 
         if type_to_analyze.code == gdb.TYPE_CODE_STRUCT:
-            heap_object = ScanMemoryDecorator.memory.add_heap_object(pointer_to_object, end_address, str(type_to_analyze))
-            variables = type_to_analyze.fields()
-            for variable in variables:
-                if variable.type.code == gdb.TYPE_CODE_PTR:
-                    pointer_to_explore = heap_value[variable]
+            end_address = object_address + 1  # pointer_to_object is a pointer. Doing + 1 goes one object ahead.
+                                              # pointer + type.sizeof is the same error it would be in C!
+            heap_object = mem.MemoryObject(str(type_to_analyze),
+                                           str(object_address),
+                                           str(end_address))
+            self.memory.add_object(heap_object)
+            self.scan_members(pointed_struct, heap_object)
 
-                    pointer_data = ScanMemoryDecorator.memory.add_pointer(heap_object, pointer_to_explore, variable.type, variable.name)
-                    if pointer_data.voidness() == "":
+
+    def scan_members(self, pointed_struct, heap_object):
+            type_to_analyze = pointed_struct.type
+            class_variables = type_to_analyze.fields()
+            for variable in class_variables:
+                log.debug("There is a variable " + str(variable.name))
+                if variable.type.code == gdb.TYPE_CODE_PTR:
+                    pointer_to_explore = pointed_struct[variable]
+                    new_pointer = mem.Pointer(str(variable.name),
+                                              str(pointer_to_explore),
+                                              pointer_to_explore.is_optimized_out)
+                    heap_object.add_outgoing_pointer(new_pointer)
+                    if new_pointer.is_valid():  # Keep going.
                         self.scan_object(pointer_to_explore)
 
 
