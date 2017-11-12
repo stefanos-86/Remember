@@ -6,6 +6,7 @@
 import argparse
 import difflib
 import os
+import re
 import subprocess
 
 import TestSuite as ts
@@ -47,6 +48,9 @@ def assert_result(test_name):
     with open(os.path.abspath("RememberOutput.dot")) as f:
         actual = f.readlines()
 
+    expected = generic_addresses(expected)
+    actual = generic_addresses(actual)
+
     changes = difflib.unified_diff(expected, actual,
                                    fromfile='expected_result_file',
                                    tofile='RESULT_FROM_TEST', lineterm='')
@@ -59,6 +63,34 @@ def assert_result(test_name):
         for line in result_lines:
             print line,
         print " ##############################################"
+
+
+def generic_addresses(dot_content):
+    """The stack changes every time the core files are recreated.
+       Should I commit the core files and the binaries in the repo?
+       Or should I "wildcard" the addresses? Or abandon this way of testing?
+       ...I wish I knew. For now, I replace the addresses with "generics"."""
+    address_translation = {}
+    address = re.compile("(0x[0-9a-f]{12})")
+    address_counter = 0
+    filtered_result = []
+
+    for line in dot_content:
+        parts = address.split(line)
+        filtered_line = ""
+        for part in parts:
+            if re.match(address, part):
+                replacement = address_translation.get(part)
+                if replacement is None:
+                    replacement = "0xAddress_" + str(address_counter)
+                    address_translation[part] = replacement
+                    filtered_line += replacement
+                    address_counter += 1
+            else:
+                filtered_line += part
+        filtered_result.append(filtered_line)
+    return filtered_result
+
 
 
 def run_test(test_name):
