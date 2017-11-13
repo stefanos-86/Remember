@@ -8,6 +8,7 @@ import sys
 sys.path.append('/usr/local/lib/python2.7/dist-packages')
 from graphviz import Digraph
 
+import logging as log
 
 def export(memory_image):
     graph = Digraph('Memory Dump', node_attr={'shape': 'record'})
@@ -24,12 +25,14 @@ def draw_memory_object(block, graph):
     label = block.name_or_type + '|' + \
             block.start_address + ' - ' + block.end_address
 
+    log.debug(block.name_or_type + str(block.outgoing_pointers))
+
     # Append all the ports.
     exit_port_count = 0
     for pointer in block.outgoing_pointers:
         if pointer.is_valid():
             port_name = "<p" + str(exit_port_count) + "> "
-            label += "|" + port_name + pointer.name
+            label += "|" + port_name + pointer.name + pointer.special_case
             draw_pointer(str(exit_port_count), pointer, block, graph)
             exit_port_count += 1
         else:
@@ -44,6 +47,8 @@ def draw_pointer(port_number, pointer, block, graph):
         destination_node = "UNKNOWN"
     else:
         destination_node = pointer.pointed_object.start_address
+
+    log.debug(block.name_or_type + str(pointer))
     graph.edge(origin_node_port, destination_node)
 
 

@@ -90,7 +90,6 @@ class ScanMemoryDecorator(gdb.FrameDecorator.FrameDecorator):
 
         frame_image = mem.MemoryObject(function_name, begin_address, end_address)
         ScanMemoryDecorator.memory.add_object(frame_image)
-
         self.scan_local_variables(frame, frame_image)
 
 
@@ -110,12 +109,22 @@ class ScanMemoryDecorator(gdb.FrameDecorator.FrameDecorator):
                     # Navigate into the object to see if there are more pointers in it.
                     self.scan_object(pointed_at_address)
 
+                if self.is_an_object(variable_type):
+                    # Fake a pointer to connect the object with the containing object.
+                    pointed_at_address = symbol.value(frame).address
+                    new_pointer = mem.Pointer(symbol.name,
+                                              str(pointed_at_address),
+                                              pointed_at_address.is_optimized_out,
+                                              mem.Pointer.SPECIAL_CASE_EMBEDDED)
+                    frame_image.add_outgoing_pointer(new_pointer)
+                    self.scan_object(pointed_at_address)
+
 
     def scan_object(self, object_address):
         pointed_struct = object_address.dereference()
         type_to_analyze = pointed_struct.type
 
-        if type_to_analyze.code == gdb.TYPE_CODE_STRUCT:
+        if self.is_an_object(type_to_analyze):
             if self.memory.unknown_object(str(object_address)):
 
                 end_address = object_address + 1  # pointer_to_object is a pointer. Doing + 1 goes one object ahead.
@@ -132,6 +141,7 @@ class ScanMemoryDecorator(gdb.FrameDecorator.FrameDecorator):
             class_variables = type_to_analyze.fields()
             for variable in class_variables:
                 log.debug("There is a variable " + str(variable.name))
+
                 if self.is_a_pointer(variable.type):
                     pointer_to_explore = pointed_struct[variable]
                     new_pointer = mem.Pointer(str(variable.name),
@@ -141,12 +151,27 @@ class ScanMemoryDecorator(gdb.FrameDecorator.FrameDecorator):
                     if new_pointer.is_valid():  # Keep going.
                         self.scan_object(pointer_to_explore)
 
+            if self.is_an_object(variable.type):
+                # Fake a pointer to connect the object with the containing object.
+                local_object_address = pointed_struct[variable].address
+                new_pointer = mem.Pointer(variable.name,
+                                          str(local_object_address),
+                                          local_object_address.is_optimized_out,
+                                          mem.Pointer.SPECIAL_CASE_EMBEDDED)
+                heap_object.add_outgoing_pointer(new_pointer)
+                self.scan_object(local_object_address)
 
     def is_a_pointer(self, gdb_type):
         """For our purposes, a pointer is anything that "ends" on an object.
            References work just the same way."""
         gdb_code = gdb_type.code
         return gdb_code == gdb.TYPE_CODE_PTR or gdb_code == gdb.TYPE_CODE_REF
+
+    def is_an_object(self, gdb_type):
+        """Tells if the thing we are looking at should be explored to find pointers inside, even if is not
+           a standalone object. It may be a field of something else or a variable on the stack."""
+        return gdb_type.code == gdb.TYPE_CODE_STRUCT
+
 
 
 class ScanMemoryFilter():

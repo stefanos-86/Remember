@@ -41,21 +41,23 @@ class Pointer:
 
     SPECIAL_CASE_OPTIMIZED = "(optimized out)"
     SPECIAL_CASE_NULL = "(nullptr)"
+    SPECIAL_CASE_EMBEDDED = "(local/stack)"
     NORMAL_CASE = ""
 
-    def __init__(self, name, pointed_address, optimized):
+    def __init__(self, name, pointed_address, optimized, other_special_case=NORMAL_CASE):
         self.name = name
         self.pointed_address = pointed_address
         self.pointed_object = None  # To be resolved once all the objects are known.
 
-        self.special_case = Pointer.NORMAL_CASE
         if self.pointed_address == "0x0":
             self.special_case = Pointer.SPECIAL_CASE_NULL
-        if optimized:
+        elif optimized:
             self.special_case = Pointer.SPECIAL_CASE_OPTIMIZED
+        else:
+            self.special_case = other_special_case
 
     def is_valid(self):
-        return self.special_case == Pointer.NORMAL_CASE
+        return self.special_case in [Pointer.NORMAL_CASE, Pointer.SPECIAL_CASE_EMBEDDED]
 
 
 class Memory:

@@ -1,0 +1,11 @@
+digraph "Memory Dump" {
+	node [shape=record]
+	rankdir=LR
+	"0x7ffee228a790":p0 -> "0x7ffee228a770"
+	"0x7ffee228a790":p1 -> "0x7ffee228a780"
+	"0x7ffee228a790" [label="function|0x7ffee228a790 - 0x7ffee228a7a0|<p0> inFunction(local/stack)|<p1> deepInside(local/stack)"]
+	"0x7ffee228a770" [label="HasPointer|0x7ffee228a770 - 0x7ffee228a778|x (nullptr)"]
+	"0x7ffee228a780":p0 -> "0x7ffee228a780"
+	"0x7ffee228a780" [label="PointersInMemebers|0x7ffee228a780 - 0x7ffee228a788|<p0> insideThisOne(local/stack)"]
+	"0x7ffee228a7a0" [label="main|0x7ffee228a7a0 - Unknown"]
+}
