@@ -107,6 +107,7 @@ class ScanMemoryDecorator(gdb.FrameDecorator.FrameDecorator):
                                               pointed_at_address.is_optimized_out)
                     frame_image.add_outgoing_pointer(new_pointer)
                     # Navigate into the object to see if there are more pointers in it.
+                    log.debug("Expand pointer");
                     self.scan_object(pointed_at_address)
 
                 if self.is_an_object(variable_type):
@@ -117,6 +118,7 @@ class ScanMemoryDecorator(gdb.FrameDecorator.FrameDecorator):
                                               pointed_at_address.is_optimized_out,
                                               mem.Pointer.SPECIAL_CASE_EMBEDDED)
                     frame_image.add_outgoing_pointer(new_pointer)
+                    log.debug("Expand local var");
                     self.scan_object(pointed_at_address)
 
 
@@ -152,6 +154,7 @@ class ScanMemoryDecorator(gdb.FrameDecorator.FrameDecorator):
                                               pointer_to_explore.is_optimized_out)
                     heap_object.add_outgoing_pointer(new_pointer)
                     if new_pointer.is_valid():  # Keep going.
+                        log.debug("Expand pointer");
                         self.scan_object(pointer_to_explore)
 
             if self.is_an_object(variable.type):
@@ -162,6 +165,7 @@ class ScanMemoryDecorator(gdb.FrameDecorator.FrameDecorator):
                                           local_object_address.is_optimized_out,
                                           mem.Pointer.SPECIAL_CASE_EMBEDDED)
                 heap_object.add_outgoing_pointer(new_pointer)
+                log.debug("Expand local var");
                 self.scan_object(local_object_address)
 
     def is_a_pointer(self, gdb_type):

@@ -37,7 +37,13 @@ class MemoryObject:
         return int(clean_address, 0)  # Base 0 is hex with 0x in front.
 
     def same_object(self, another):
-        return self.start_address == another.end_address and self.end_address == another.end_address
+        log.debug("         self start [" + self.start_address + "]")
+        log.debug("         self end [" + self.end_address + "]")
+        log.debug("         other start [" + another.start_address + "]")
+        log.debug("         other end[" + another.end_address + "]")
+        log.debug("         Same? [" + str(self.start_address == another.end_address and self.end_address == another.end_address) + "]")
+
+        return self.start_address == another.start_address and self.end_address == another.end_address
 
     def size(self):
         return self.address_to_int(self.end_address) - self.address_to_int(self.start_address)
@@ -93,7 +99,10 @@ class Memory:
         pointer.pointed_object = best_fit
 
     def unknown_object(self, another_object):
+        log.debug("Knowledge of " + another_object.start_address + " " + another_object.end_address)
         for memory_object in self.objects:
+            log.debug("    against " + memory_object.start_address + " " + memory_object.end_address)
             if memory_object.same_object(another_object):
+                log.debug("    found it")
                 return False
         return True
