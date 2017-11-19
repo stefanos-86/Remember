@@ -70,7 +70,9 @@ class ScanMemoryDecorator(gdb.FrameDecorator.FrameDecorator):
             self.scan_stack_frame()
         except Exception as problem:
             log.error(str(problem))
-            log.error("\n".join(traceback.format_exception(Exception, problem, None)))
+            error_message = traceback.format_exception(Exception, problem, None, 100)
+            log.debug(len(error_message))
+            log.error("\n".join(error_message))
 
         return gdb.FrameDecorator.FrameDecorator.function(self)  # Same text output as without this class.
 
@@ -157,16 +159,16 @@ class ScanMemoryDecorator(gdb.FrameDecorator.FrameDecorator):
                         log.debug("Expand pointer");
                         self.scan_object(pointer_to_explore)
 
-            if self.is_an_object(variable.type):
-                # Fake a pointer to connect the object with the containing object.
-                local_object_address = pointed_struct[variable].address
-                new_pointer = mem.Pointer(variable.name,
-                                          str(local_object_address),
-                                          local_object_address.is_optimized_out,
-                                          mem.Pointer.SPECIAL_CASE_EMBEDDED)
-                heap_object.add_outgoing_pointer(new_pointer)
-                log.debug("Expand local var");
-                self.scan_object(local_object_address)
+                if self.is_an_object(variable.type):
+                    # Fake a pointer to connect the object with the containing object.
+                    local_object_address = pointed_struct[variable].address
+                    new_pointer = mem.Pointer(variable.name,
+                                              str(local_object_address),
+                                              local_object_address.is_optimized_out,
+                                              mem.Pointer.SPECIAL_CASE_EMBEDDED)
+                    heap_object.add_outgoing_pointer(new_pointer)
+                    log.debug("Expand local var");
+                    self.scan_object(local_object_address)
 
     def is_a_pointer(self, gdb_type):
         """For our purposes, a pointer is anything that "ends" on an object.

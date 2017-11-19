@@ -41,7 +41,6 @@ class MemoryObject:
         log.debug("         self end [" + self.end_address + "]")
         log.debug("         other start [" + another.start_address + "]")
         log.debug("         other end[" + another.end_address + "]")
-        log.debug("         Same? [" + str(self.start_address == another.end_address and self.end_address == another.end_address) + "]")
 
         return self.start_address == another.start_address and self.end_address == another.end_address
 
