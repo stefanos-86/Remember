@@ -83,6 +83,7 @@ class ScanMemoryDecorator(gdb.FrameDecorator.FrameDecorator):
         function_name = str(frame.name())
         begin_address = str(frame.read_register("sp"))  # The stack grows "going down", begin is higher then end.
 
+        log.debug("Stack frame " + function_name + " " + begin_address)
 
         called_from_frame = frame.older()
         if called_from_frame is None:
@@ -101,9 +102,14 @@ class ScanMemoryDecorator(gdb.FrameDecorator.FrameDecorator):
 
         for symbol in function_code:
             if symbol.is_variable or symbol.is_argument:
+                log.debug("Stack variable " + str(symbol.name))
                 variable_type = symbol.type
                 if self.is_a_pointer(variable_type):
-                    pointed_at_address = frame.read_var(symbol, function_code)
+                    if variable_type.code == gdb.TYPE_CODE_PTR:
+                        pointed_at_address = frame.read_var(symbol, function_code)
+                    else:
+                        referenced_object = frame.read_var(symbol, function_code)
+                        pointed_at_address = referenced_object.address
                     new_pointer = mem.Pointer(symbol.name,
                                               str(pointed_at_address),
                                               pointed_at_address.is_optimized_out)

@@ -1,0 +1,9 @@
+digraph "Memory Dump" {
+	node [shape=record]
+	rankdir=LR
+	"0x7ffdb3322270":p0 -> "0x7ffdb3322287"
+	"0x7ffdb3322270" [label="upperFunction|0x7ffdb3322270 - 0x7ffdb3322280|<p0> temporary"]
+	"0x7ffdb3322287" [label="const SomeKindOfClass|0x7ffdb3322287 - 0x7ffdb3322288"]
+	"0x7ffdb3322280" [label="function|0x7ffdb3322280 - 0x7ffdb33222a0"]
+	"0x7ffdb33222a0" [label="main|0x7ffdb33222a0 - Unknown"]
+}
