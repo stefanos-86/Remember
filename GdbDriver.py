@@ -124,14 +124,17 @@ class ScanMemoryDecorator(gdb.FrameDecorator.FrameDecorator):
         pointed_struct = object_address.dereference()
         type_to_analyze = pointed_struct.type
 
-        if self.is_an_object(type_to_analyze):
-            if self.memory.unknown_object(str(object_address)):
+        log.debug("There is an object " + str(object_address))
 
-                end_address = object_address + 1  # pointer_to_object is a pointer. Doing + 1 goes one object ahead.
-                                                  # pointer + type.sizeof is the same error it would be in C!
-                heap_object = mem.MemoryObject(str(type_to_analyze),
-                                               str(object_address),
-                                               str(end_address))
+        if self.is_an_object(type_to_analyze):
+            end_address = object_address + 1  # pointer_to_object is a pointer. Doing + 1 goes one object ahead.
+                                              # pointer + type.sizeof is the same error it would be in C!
+            heap_object = mem.MemoryObject(str(type_to_analyze),
+                                           str(object_address),
+                                           str(end_address))
+
+            if self.memory.unknown_object(heap_object):
+                log.debug("    addded " + str(object_address))
                 self.memory.add_object(heap_object)
                 self.scan_members(pointed_struct, heap_object)
 

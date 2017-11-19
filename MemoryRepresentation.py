@@ -27,6 +27,7 @@ class MemoryObject:
                self.address_to_int(pointer.pointed_address) < \
                self.address_to_int(self.end_address)
 
+
     def address_to_int(self, address):
         """Pointers start with 0x, references with @0x, but both must be convertible to something we can
            compare and order, to guess where things are in memory."""
@@ -34,6 +35,12 @@ class MemoryObject:
         if address.startswith("@"):
             clean_address = address[1:]
         return int(clean_address, 0)  # Base 0 is hex with 0x in front.
+
+    def same_object(self, another):
+        return self.start_address == another.end_address and self.end_address == another.end_address
+
+    def size(self):
+        return self.address_to_int(self.end_address) - self.address_to_int(self.start_address)
 
 
 class Pointer:
@@ -71,22 +78,22 @@ class Memory:
     def resolve_pointed_objects(self):
         """A pointer is only a memory address. Into which object does it fall?
            This can be determined only after all objects have been explored and their
-           addresses are known."""
+           addresses are known. Pick the most specific addresses."""
         for memory_object in self.objects:
             for pointer in memory_object.outgoing_pointers:
                 if pointer.is_valid():
                     self.resolve_pointer(pointer)
 
     def resolve_pointer(self, pointer):
+        best_fit = None
         for memory_object in self.objects:
-            log.debug("Resolve " + pointer.name + " against " + memory_object.start_address)
             if memory_object.contains(pointer):
-                pointer.pointed_object = memory_object
-                return  # No point into going further, we found the target.
+                if best_fit is None or best_fit.size() >= memory_object.size():
+                    best_fit = memory_object
+        pointer.pointed_object = best_fit
 
-    def unknown_object(self, object_address):
+    def unknown_object(self, another_object):
         for memory_object in self.objects:
-            fake_pointer = Pointer("Fake", object_address, False)  # Contains expects a pointer, not just an address.
-            if memory_object.contains(fake_pointer):
+            if memory_object.same_object(another_object):
                 return False
         return True
