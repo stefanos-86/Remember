@@ -1,0 +1,9 @@
+digraph "Memory Dump" {
+	node [shape=record]
+	rankdir=LR
+	"0x7ffc8ac1ec40":p0 -> "0x7ffc8ac1ec50"
+	"0x7ffc8ac1ec40":p1 -> UNKNOWN
+	"0x7ffc8ac1ec40" [label="function|0x7ffc8ac1ec40 - 0x7ffc8ac1ec80|<p0> arrayOnStack(local/stack)|<p1> arrayInHeap"]
+	"0x7ffc8ac1ec50" [label="int [5]|0x7ffc8ac1ec50 - 0x7ffc8ac1ec64"]
+	"0x7ffc8ac1ec80" [label="main|0x7ffc8ac1ec80 - Unknown"]
+}

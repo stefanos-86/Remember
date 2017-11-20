@@ -129,12 +129,44 @@ class ScanMemoryDecorator(gdb.FrameDecorator.FrameDecorator):
                     log.debug("Expand local var");
                     self.scan_object(pointed_at_address)
 
+                if self.is_an_array(variable_type):
+                    total_size = variable_type.sizeof
+                    element_type = variable_type.target()
+                    element_size =  element_type.sizeof
+                    elements_count = int(total_size / element_size)
+                    array_object = symbol.value(frame)
+                    base_address = array_object.address
+
+                    # Fake object to represent the array.
+                    heap_object = mem.MemoryObject(str(variable_type),
+                                                   str(base_address),
+                                                   str(base_address + 1))
+
+                    if self.memory.unknown_object(heap_object):
+                        self.memory.add_object(heap_object)
+
+                    local_array_pointer = mem.Pointer(symbol.name,
+                                                      str(base_address),
+                                                      base_address.is_optimized_out,
+                                                        mem.Pointer.SPECIAL_CASE_EMBEDDED)
+                    frame_image.add_outgoing_pointer(local_array_pointer)
+
+                    # Look into each element.
+                    for array_index in range(0, elements_count):
+                        element = array_object[array_index]
+                        element_address = element.address
+                        log.debug("Array element " + str(array_index) + " at " + str(element_address))
+
+                        self.scan_object(element_address)
+
+
+
 
     def scan_object(self, object_address):
         pointed_struct = object_address.dereference()
         type_to_analyze = pointed_struct.type
 
-        log.debug("There is an object " + str(object_address))
+        log.debug("There is an object " + str(object_address) + " of type " + str(type_to_analyze))
 
         if self.is_an_object(type_to_analyze):
             end_address = object_address + 1  # pointer_to_object is a pointer. Doing + 1 goes one object ahead.
@@ -186,6 +218,10 @@ class ScanMemoryDecorator(gdb.FrameDecorator.FrameDecorator):
         """Tells if the thing we are looking at should be explored to find pointers inside, even if is not
            a standalone object. It may be a field of something else or a variable on the stack."""
         return gdb_type.code == gdb.TYPE_CODE_STRUCT
+
+    def is_an_array(self, gdb_type):
+        """We need to know if we are facing a collection of objects. """
+        return gdb_type.code == gdb.TYPE_CODE_ARRAY
 
 
 
