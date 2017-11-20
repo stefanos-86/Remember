@@ -116,6 +116,7 @@ class ScanMemoryDecorator(gdb.FrameDecorator.FrameDecorator):
                     frame_image.add_outgoing_pointer(new_pointer)
                     # Navigate into the object to see if there are more pointers in it.
                     log.debug("Expand pointer");
+                    log.debug(pointed_at_address.dereference().dynamic_type)
                     self.scan_object(pointed_at_address)
 
                 if self.is_an_object(variable_type):
@@ -207,6 +208,7 @@ class ScanMemoryDecorator(gdb.FrameDecorator.FrameDecorator):
                     heap_object.add_outgoing_pointer(new_pointer)
                     log.debug("Expand local var");
                     self.scan_object(local_object_address)
+
 
     def is_a_pointer(self, gdb_type):
         """For our purposes, a pointer is anything that "ends" on an object.
