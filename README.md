@@ -6,11 +6,13 @@ Well, yes. A whole [Python API](https://sourceware.org/gdb/onlinedocs/gdb/Python
 ## What's to Remember?
 This is another "try and see" experiment. The GDB script inside scans the memory saved in a core file to find pointers and objects inside. Anything that the core file "rememebers", hence the name. It gives a nice graph.
 
-The above comes from:
+Example:
+```
+.../Remember$ python remember.py -o niceGraph.svg ./testCores/demo.3551 ./testPrograms/demo
+```
+
 ![A graph from a test](https://github.com/stefanos-86/Remember/blob/master/demo.png)
-```
-...Remember$ python remember.py -o niceGraph.svg ./testCores/demo.3551 ./testPrograms/demo
-```
+
 
 It is in no way perfect and probably impossible to use on any "real" program. The code is not the best either. But it shows it can be done, and this is surprising enough to me!
 
