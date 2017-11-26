@@ -16,7 +16,7 @@ Example:
 
 It is in no way perfect and probably impossible to use on any "real" program. The code is not the best either. But it shows it can be done, and this is surprising enough to me!
 
-To make this boondoggle work you need to be on Linux, with [Python](https://www.python.org/), [gcc](https://gcc.gnu.org/) and GDB. Remember uses the [Graphiz Python API](https://graphviz.readthedocs.io/en/stable/examples.html#structs-revisited-py) to draw its graphs.
+To make this boondoggle work you need to be on Linux, with [Python](https://www.python.org/), [gcc](https://gcc.gnu.org/) and GDB. Remember uses the [Graphviz Python API](https://graphviz.readthedocs.io/en/stable/examples.html#structs-revisited-py) to draw its graphs.
 
 ## What can't you Remeber?
 Lots of things, but the most obvious limit is the automatic scanning of arrays. Says you have a int* pointer: just an int? Or an int in the middle of an array? There is no data in a core file to understand this is any reliable way.
