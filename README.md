@@ -21,7 +21,7 @@ To make this boondoggle work you need to be on Linux, with [Python](https://www.
 ## What can't you Remeber?
 Lots of things, but the most obvious limit is the automatic scanning of arrays. Says you have a int* pointer: just an int? Or an int in the middle of an array? There is no data in a core file to understand this is any reliable way.
 
-Other cases have not been considered due to lack of time to waste on this project. Among the things I "forgot" to handle: arrays inside objects, arrays of pointers, multi dimensional arrays, lamda functions, smart pointer, STL... You can forget about them too - it is unlikely I'll find the time.
+Other cases have not been considered due to lack of time to waste on this project. Among the things I "forgot" to handle: arrays inside objects, arrays of pointers, multi dimensional arrays, lamda functions, smart pointers, STL... You can forget about them too - it is unlikely I'll find the time.
 
 ## The testing framework.
 Where are the unit tests? Well, there aren't. Since I litteraly did not know what I was doing, I had an hard time predicting the output. What should the Graphviz input be to get the proper graph? What is GDB going to return me under a given situation? How am I going to prepare a test case or an assert() without knowing?
