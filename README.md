@@ -26,7 +26,7 @@ Other cases have not been considered due to lack of time to waste on this projec
 ## The testing framework.
 Where are the unit tests? Well, there aren't. Since I litteraly did not know what I was doing, I had an hard time predicting the output. What should the Graphviz input be to get the proper graph? What is GDB going to return me under a given situation? How am I going to prepare a test case or an assert() without knowing?
 
-What you find instead is a set of test C++ programs and a couple of scripts to quickly create core dumps, run the tool on them and compare the resulting graph with a known good output. The programs have infinite loops inside so they "wait" at the right moment until `gcore` comes and dumps them. It is less automated testing and more automated tampering, but it gets the job done.
+What you find instead is a set of test C++ programs and a couple of scripts to quickly create core dumps, run the tool on them and compare the resulting graph with a known good output. The programs have infinite loops inside so they "wait" at the right moment until `gcore` comes and dumps them. It is more automated tampering than automated testing, but it helps to experiment quickly with the examples.
 
 In practice:
 ```
